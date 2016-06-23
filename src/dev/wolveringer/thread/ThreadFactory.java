@@ -1,10 +1,18 @@
 package dev.wolveringer.thread;
 
 public abstract class ThreadFactory {
-	public static ThreadFactory THREAD_FACTORY;
+	private static ThreadFactory instance;
+
+	public static ThreadFactory getInstance() {
+		return instance;
+	}
+
+	public static void setInstance(ThreadFactory instance) {
+		ThreadFactory.instance = instance;
+	}
 
 	static {
-		THREAD_FACTORY = new ThreadFactory() {
+		instance = new ThreadFactory() {
 			@Override
 			public void createAsync(Runnable run, EventLoop loop) {
 				loop.join(run);
