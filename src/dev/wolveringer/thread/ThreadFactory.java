@@ -14,15 +14,6 @@ public abstract class ThreadFactory {
 	static {
 		instance = new ThreadFactory() {
 			@Override
-			public void createAsync(Runnable run, EventLoop loop) {
-				loop.join(run);
-			}
-
-			@Override
-			public void createAsync(Runnable run) {
-				createAsync(run, EventLoop.UNLIMITED_LOOP);
-			}
-			@Override
 			public ThreadRunner createThread(final Runnable run) {
 					return new ThreadRunner() {
 						Thread t;
@@ -30,7 +21,8 @@ public abstract class ThreadFactory {
 						public void start() {
 							if(t != null)
 								throw new IllegalStateException("Thread is alredy running!");
-							t = EventLoop.UNLIMITED_LOOP.join(run);
+							t = new Thread(run);
+							t.start();
 						}
 						public void stop() {
 							if(t == null)
@@ -43,9 +35,5 @@ public abstract class ThreadFactory {
 		};
 	}
 
-	public abstract void createAsync(Runnable run);
-
-	public abstract void createAsync(Runnable run, EventLoop loop);
-	
 	public abstract ThreadRunner createThread(Runnable run);
 }

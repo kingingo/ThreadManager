@@ -10,14 +10,14 @@ public class EventLoop {
 	
 	private int MAX_THREADS = 0;
 	private List<Runnable> todo = (List<Runnable>) Collections.synchronizedList(new ArrayList<Runnable>());
-	private List<Thread> threads = (List<Thread>) Collections.synchronizedList(new ArrayList<Thread>());
+	private List<ThreadRunner> threads = (List<ThreadRunner>) Collections.synchronizedList(new ArrayList<ThreadRunner>());
 	public EventLoop(int maxthreads) {
 		this.MAX_THREADS = maxthreads;
 	}
 	
-	public Thread join(final Runnable run) {
+	public ThreadRunner join(final Runnable run) {
 		if (MAX_THREADS <= 0 || threads.size() < MAX_THREADS || MAX_THREADS == -1) {
-			Thread t = new Thread(){
+			ThreadRunner t = ThreadFactory.getInstance().createThread(new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -40,7 +40,7 @@ public class EventLoop {
 						threads.remove(this);
 					}
 				}
-			};
+			});
 			t.start();
 			threads.add(t);
 			return t;
@@ -56,7 +56,7 @@ public class EventLoop {
 			return threads.size();
 		}
 	}
-	public List<Thread> getWorkingThreads(){
+	public List<ThreadRunner> getWorkingThreads(){
 		synchronized (threads) {
 			return Collections.unmodifiableList(threads);
 		}
@@ -73,9 +73,9 @@ public class EventLoop {
 			todo.clear();
 		}
 		synchronized (threads) {
-			for(Thread t : new ArrayList<>(threads))
+			for(ThreadRunner t : new ArrayList<>(threads))
 				try{
-					t.interrupt();
+					t.stop();
 				}catch (Exception e) {
 					e.printStackTrace();
 				}
