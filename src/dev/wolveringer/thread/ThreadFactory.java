@@ -10,26 +10,34 @@ public abstract class ThreadFactory {
 	public static void setInstance(ThreadFactory instance) {
 		ThreadFactory.instance = instance;
 	}
+	
+	public static ThreadFactory getFactory(){
+		return getInstance();
+	}
 
 	static {
 		instance = new ThreadFactory() {
 			@Override
 			public ThreadRunner createThread(final Runnable run) {
 					return new ThreadRunner() {
-						Thread t;
+						Thread thread;
 						@Override
 						public void start() {
-							if(t != null)
+							if(thread != null)
 								throw new IllegalStateException("Thread is alredy running!");
-							t = new Thread(run);
-							t.start();
+							thread = new Thread(run);
+							thread.start();
 						}
 						public void stop() {
-							if(t == null)
+							if(thread == null)
 								throw new IllegalStateException("Thread isnt running!");
-							t.interrupt();
-							t = null;
+							thread.interrupt();
+							thread = null;
 						};
+						@Override
+						public Thread getThread() {
+							return thread;
+						}
 					};
 			}
 		};

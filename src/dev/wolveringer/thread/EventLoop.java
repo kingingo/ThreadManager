@@ -11,12 +11,13 @@ public class EventLoop {
 	private int MAX_THREADS = 0;
 	private List<Runnable> todo = (List<Runnable>) Collections.synchronizedList(new ArrayList<Runnable>());
 	private List<ThreadRunner> threads = (List<ThreadRunner>) Collections.synchronizedList(new ArrayList<ThreadRunner>());
+	
 	public EventLoop(int maxthreads) {
 		this.MAX_THREADS = maxthreads;
 	}
 	
 	public ThreadRunner join(final Runnable run) {
-		if (MAX_THREADS <= 0 || threads.size() < MAX_THREADS || MAX_THREADS == -1) {
+		if (MAX_THREADS <= 0 || threads.size() < MAX_THREADS) {
 			ThreadRunner t = ThreadFactory.getInstance().createThread(new Runnable() {
 				@Override
 				public void run() {
@@ -27,27 +28,21 @@ public class EventLoop {
 					}
 					while (true) {
 						Runnable next = null;
-						synchronized (todo) {
-							if (todo.size() != 0) {
-								next = todo.get(0);
-								todo.remove(next);
-							} else
-								break;
-						}
+						if (todo.size() != 0) {
+							next = todo.get(0);
+							todo.remove(next);
+						} else
+							break;
 						next.run();
 					}
-					synchronized (threads) {
-						threads.remove(this);
-					}
+					threads.remove(this);
 				}
 			});
 			t.start();
 			threads.add(t);
 			return t;
 		} else
-			synchronized (todo) {
-				todo.add(run);
-			}
+			todo.add(run);
 		return null;
 	}
 	
@@ -80,6 +75,28 @@ public class EventLoop {
 					e.printStackTrace();
 				}
 		}
+	}
+	
+	public static void main(String[] args) {
+		EventLoop loop = new EventLoop(1);
+		loop.join(()->{
+			System.out.println("Start 1");
+			try {
+				Thread.sleep(1000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			System.out.println("End 1");
+		});
+		loop.join(()->{
+			System.out.println("Start 2");
+			try {
+				Thread.sleep(1000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			System.out.println("End 2");
+		});
 	}
 }
 
