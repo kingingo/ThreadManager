@@ -1,4 +1,4 @@
-package dev.wolveringer.thread;
+package eu.epicpvp.thread;
 
 public abstract class ThreadFactory {
 	private static ThreadFactory instance;

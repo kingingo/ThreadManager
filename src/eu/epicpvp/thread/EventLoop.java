@@ -1,4 +1,4 @@
-package dev.wolveringer.thread;
+package eu.epicpvp.thread;
 
 import java.util.ArrayList;
 import java.util.Collections;

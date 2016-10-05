@@ -1,4 +1,4 @@
-package dev.wolveringer.thread;
+package eu.epicpvp.thread;
 
 public interface ThreadRunner {
 	public void start();
